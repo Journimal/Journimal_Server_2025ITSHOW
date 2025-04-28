@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User Table
+model User {
+  id           Int    @id @default(autoincrement())
+  userId       String @unique
+  userPassword String
+  userNickname String
+
+  // relation
+  userAnimal UserAnimal[]
+  trip       Trip[]
+}
+
+// UserAnimal Table
+model UserAnimal {
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [userId], references: [id])
+  userId   Int
+  animal   Animal @relation(fields: [animalId], references: [id])
+  animalId Int
+  count    Int    @default(0)
+}
+
+// Trip table
+model Trip {
+  id              Int      @id @default(autoincrement())
+  departure       String
+  arrival         String
+  first_day       DateTime
+  last_day        DateTime
+  completeMission Int
+  lastAnimal      Animal?  @relation("LastAnimalRelation", fields: [lastAnimalId], references: [id])
+  lastAnimalId    Int?
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  animal   Animal? @relation("AnimalTrips", fields: [animalId], references: [id])
+  animalId Int?
+}
+
+// Mission Table
+model Mission {
+  id           Int    @id @default(autoincrement())
+  mission_name String
+  missionLevel String
+  thumbnail    String
+  missionImage String
+  description  String
+}
+
+// Animal Table
+model Animal {
+  id       Int    @id @default(autoincrement())
+  aniImage String
+  aniName  String
+  aniLevel String
+
+  userAnimals       UserAnimal[]
+  trips             Trip[]       @relation("AnimalTrips")
+  lastAnimalInTrips Trip[]       @relation("LastAnimalRelation")
+}
+
+// Airport Table
+model Airport {
+  id          Int    @id @default(autoincrement())
+  airportName String
+  country     String
+  city        String
+  code        String @unique
+}
