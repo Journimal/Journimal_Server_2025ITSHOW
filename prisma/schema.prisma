@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -22,8 +21,9 @@ model User {
   userNickname String
 
   // relation
-  userAnimal UserAnimal[]
-  trip       Trip[]
+  userAnimal   UserAnimal[]
+  userMissions UserMission[]
+  trip         Trip[]
 }
 
 // UserAnimal Table
@@ -36,13 +36,24 @@ model UserAnimal {
   count    Int    @default(0)
 }
 
+// UserMission Table
+model UserMission {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  mission   Mission @relation(fields: [missionId], references: [id])
+  missionId Int
+
+  isCompleted Boolean @default(false)
+}
+
 // Trip table
 model Trip {
   id              Int      @id @default(autoincrement())
   departure       String
   arrival         String
-  first_day       DateTime
-  last_day        DateTime
+  firstDay        DateTime
+  lastDay         DateTime
   completeMission Int
   lastAnimal      Animal?  @relation("LastAnimalRelation", fields: [lastAnimalId], references: [id])
   lastAnimalId    Int?
@@ -56,12 +67,16 @@ model Trip {
 
 // Mission Table
 model Mission {
-  id           Int    @id @default(autoincrement())
-  mission_name String
-  missionLevel String
-  thumbnail    String
-  missionImage String
-  description  String
+  id          Int    @id @default(autoincrement())
+  missionName String
+  missionIcon String
+  thumbnail   String
+  description String
+  question1   String
+  question2   String
+  question3   String
+
+  userMissions UserMission[]
 }
 
 // Animal Table
