@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { MissionModule } from './mission/mission.module';
+import { TripModule } from './trip/trip.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MissionModule } from './mission/mission.module';
     PrismaModule,
     UserModule,
     MissionModule,
+    TripModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
