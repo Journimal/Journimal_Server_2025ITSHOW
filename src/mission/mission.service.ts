@@ -53,6 +53,7 @@ export class MissionService {
         where: {
           userId: userId,
           missionId: createUserMissionDto.missionId,
+          round: createUserMissionDto.round,
         },
       });
 
@@ -68,6 +69,8 @@ export class MissionService {
           userId: userId,
           missionId: createUserMissionDto.missionId,
           isCompleted: createUserMissionDto.isCompleted,
+          round: createUserMissionDto.round,
+          tripId: createUserMissionDto.tripId,
         },
       });
 
@@ -77,11 +80,11 @@ export class MissionService {
         userMission,
       );
     } catch (err) {
+      console.log(err);
       throw new HttpException(
         new BaseResponse(
           HttpStatus.BAD_REQUEST,
           MESSAGE.USER_MISSION_NOT_CREATED,
-          err,
         ),
         HttpStatus.BAD_REQUEST,
       );
@@ -96,12 +99,13 @@ export class MissionService {
       const userMissions = await this.prisma.userMission.findMany({
         where: { userId: userId },
         include: { mission: true },
-        take: 2,
       });
 
       const resultUserMission: GetCurrentUserMissionDto = {
         userId: userId,
         userMissions: userMissions.map((um) => ({
+          id: um.id,
+          round: um.round,
           missionId: um.missionId,
           missionName: um.mission.missionName,
           missionIcon: um.mission.missionIcon,
@@ -129,11 +133,21 @@ export class MissionService {
   // complete mission (at user_mission)
   async completeUserMission(
     userMissionId: number,
+    tripId: number,
   ): Promise<BaseResponse<CompleteMissionDto>> {
     try {
       const mission = await this.prisma.userMission.update({
         where: { id: userMissionId },
         data: { isCompleted: true },
+      });
+
+      await this.prisma.trip.update({
+        where: { id: tripId },
+        data: {
+          completeMission: {
+            increment: 1,
+          },
+        },
       });
 
       return new BaseResponse(
