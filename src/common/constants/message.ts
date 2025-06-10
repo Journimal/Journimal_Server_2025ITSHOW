@@ -18,4 +18,10 @@ export const MESSAGE = {
   USER_MISSION_UPDATED: 'User Mission updated',
   USER_MISSION_NOT_DELETED: 'User Mission not deleted',
   USER_MISSION_DELETED: 'User Mission deleted',
+  TRIP_CREATED: 'Trip created successfully',
+  TRIP_NOT_CREATED: 'Trip not created',
+  TRIP_FOUND: 'Trip found',
+  TRIP_NOT_FOUND: 'Trip not found',
+  TRIP_UPDATED: 'Trip updated',
+  TRIP_NOT_UPDATED: 'Trip not updated',
 };
