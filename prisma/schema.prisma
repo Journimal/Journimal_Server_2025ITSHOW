@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,85 +7,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Table
 model User {
-  id           Int    @id @default(autoincrement())
-  userId       String @unique
+  id           Int           @id @default(autoincrement())
+  userId       String        @unique
   userPassword String
   userNickname String
-
-  // relation
+  trip         Trip[]
   userAnimal   UserAnimal[]
   userMissions UserMission[]
-  trip         Trip[]
 }
 
-// UserAnimal Table
 model UserAnimal {
   id       Int    @id @default(autoincrement())
-  user     User   @relation(fields: [userId], references: [id])
   userId   Int
-  animal   Animal @relation(fields: [animalId], references: [id])
   animalId Int
   count    Int    @default(0)
+  tripId   Int
+  animal   Animal @relation(fields: [animalId], references: [id])
+  trip     Trip   @relation(fields: [tripId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+
+  @@index([animalId], map: "UserAnimal_animalId_fkey")
+  @@index([userId], map: "UserAnimal_userId_fkey")
+  @@index([tripId], map: "UserAnimal_tripId_fkey")
 }
 
-// UserMission Table
 model UserMission {
-  id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id])
-  userId    Int
-  mission   Mission @relation(fields: [missionId], references: [id])
-  missionId Int
-
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  missionId   Int
   isCompleted Boolean @default(false)
+  round       Int
+  tripId      Int
+  mission     Mission @relation(fields: [missionId], references: [id])
+  trip        Trip    @relation(fields: [tripId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
+
+  @@index([missionId], map: "UserMission_missionId_fkey")
+  @@index([userId], map: "UserMission_userId_fkey")
+  @@index([tripId], map: "UserMission_tripId_fkey")
 }
 
-// Trip table
 model Trip {
-  id              Int      @id @default(autoincrement())
+  id              Int           @id @default(autoincrement())
   departure       String
   arrival         String
   firstDay        DateTime
   lastDay         DateTime
-  completeMission Int
-  lastAnimal      Animal?  @relation("LastAnimalRelation", fields: [lastAnimalId], references: [id])
+  completeMission Int           @default(0)
   lastAnimalId    Int?
+  userId          Int?
+  animalId        Int?
+  level           String        @default("NONE")
+  animal          Animal?       @relation("AnimalTrips", fields: [animalId], references: [id])
+  lastAnimal      Animal?       @relation("LastAnimalRelation", fields: [lastAnimalId], references: [id])
+  user            User?         @relation(fields: [userId], references: [id])
+  UserAnimal      UserAnimal[]
+  UserMission     UserMission[]
 
-  user   User? @relation(fields: [userId], references: [id])
-  userId Int?
-
-  animal   Animal? @relation("AnimalTrips", fields: [animalId], references: [id])
-  animalId Int?
+  @@index([animalId], map: "Trip_animalId_fkey")
+  @@index([lastAnimalId], map: "Trip_lastAnimalId_fkey")
+  @@index([userId], map: "Trip_userId_fkey")
 }
 
-// Mission Table
 model Mission {
-  id          Int    @id @default(autoincrement())
-  missionName String
-  missionIcon String
-  thumbnail   String
-  description String
-  question1   String
-  question2   String
-  question3   String
-
+  id           Int           @id @default(autoincrement())
+  missionName  String
+  missionIcon  String
+  thumbnail    String
+  description  String
+  question1    String
+  question2    String
+  question3    String
   userMissions UserMission[]
 }
 
-// Animal Table
 model Animal {
-  id       Int    @id @default(autoincrement())
-  aniImage String
-  aniName  String
-  aniLevel String
-
-  userAnimals       UserAnimal[]
+  id                Int          @id @default(autoincrement())
+  aniImage          String
+  aniName           String
+  aniLevel          String
   trips             Trip[]       @relation("AnimalTrips")
   lastAnimalInTrips Trip[]       @relation("LastAnimalRelation")
+  userAnimals       UserAnimal[]
 }
 
-// Airport Table
 model Airport {
   id          Int    @id @default(autoincrement())
   airportName String
