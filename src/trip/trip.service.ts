@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { MESSAGE } from 'src/common/constants/message';
 import { BaseResponse } from 'src/common/dto/base-response.dto';
-import { Trip } from '@prisma/client';
+import { Airport, Trip, UserAnimal } from '@prisma/client';
 
 @Injectable()
 export class TripService {
@@ -67,6 +67,7 @@ export class TripService {
     }
   }
 
+  // for test
   async deleteTrip(tripId: number) {
     try {
       await this.prisma.trip.delete({ where: { id: tripId } });
@@ -165,7 +166,10 @@ export class TripService {
     }
   }
 
-  async getTrip(userId: number, tripId: number) {
+  async getTrip(
+    userId: number,
+    tripId: number,
+  ): Promise<BaseResponse<UserAnimal[]>> {
     try {
       const tripAnimals = await this.prisma.userAnimal.findMany({
         where: {
@@ -182,6 +186,22 @@ export class TripService {
       console.log(err);
       throw new HttpException(
         new BaseResponse(HttpStatus.BAD_REQUEST, MESSAGE.TRIP_NOT_FOUND, err),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async getAllAirport(airportName: string): Promise<BaseResponse<Airport[]>> {
+    try {
+      const airports = await this.prisma.airport.findMany({
+        where: { airportName: { contains: airportName } },
+      });
+
+      return new BaseResponse(HttpStatus.OK, MESSAGE.AIRPORT_FOUND, airports);
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        new BaseResponse(HttpStatus.BAD_REQUEST, MESSAGE.AIRPORT_NOT_FOUND),
         HttpStatus.BAD_REQUEST,
       );
     }

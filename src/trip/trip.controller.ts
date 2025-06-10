@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { TripService } from './trip.service';
@@ -14,7 +15,7 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { BaseResponse } from 'src/common/dto/base-response.dto';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
-import { Trip, User } from '@prisma/client';
+import { Airport, Trip, User, UserAnimal } from '@prisma/client';
 
 @UseGuards(JwtAuthGuard)
 @Controller('trip')
@@ -43,11 +44,18 @@ export class TripController {
     return this.tripService.updateTripByLevel(user.id, tripId, round);
   }
 
+  @Get('/airport')
+  getAllAirport(
+    @Query('airportName') airportName: string,
+  ): Promise<BaseResponse<Airport[]>> {
+    return this.tripService.getAllAirport(airportName);
+  }
+
   @Get(':tripId')
   getTrip(
     @CurrentUser() user: User,
     @Param('tripId', ParseIntPipe) tripId: number,
-  ) {
+  ): Promise<BaseResponse<UserAnimal[]>> {
     return this.tripService.getTrip(user.id, tripId);
   }
 

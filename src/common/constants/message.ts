@@ -24,4 +24,6 @@ export const MESSAGE = {
   TRIP_NOT_FOUND: 'Trip not found',
   TRIP_UPDATED: 'Trip updated',
   TRIP_NOT_UPDATED: 'Trip not updated',
+  AIRPORT_FOUND: 'Airport found',
+  AIRPORT_NOT_FOUND: 'Airport not found',
 };
