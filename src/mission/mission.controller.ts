@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -54,10 +55,13 @@ export class MissionController {
   }
 
   // complete mission (at user_mission)
-  @Post(':id')
+  @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  completeUserMission(@Param('id', ParseIntPipe) userMissionId: number) {
-    return this.missionService.completeUserMission(userMissionId);
+  completeUserMission(
+    @Param('id', ParseIntPipe) userMissionId: number,
+    @Body('tripId', ParseIntPipe) tripId: number,
+  ) {
+    return this.missionService.completeUserMission(userMissionId, tripId);
   }
 
   // delete user_mission
